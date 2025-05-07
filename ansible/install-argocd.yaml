@@ -1,0 +1,16 @@
+---
+- name: Install Argo CD in Kubernetes
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Apply Argo CD install manifest
+      shell: |
+        kubectl apply -n gitops -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      register: argocd_result
+      failed_when: "'error' in argocd_result.stderr"
+
+    - name: Wait for Argo CD server to be ready
+      shell: |
+        kubectl rollout status deployment/argocd-server -n gitops --timeout=120s

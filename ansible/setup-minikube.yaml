@@ -1,0 +1,27 @@
+---
+- name: Setup Minikube and Kubernetes Namespace
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Check if kubectl is installed
+      command: kubectl version --client
+      register: kubectl_check
+      ignore_errors: true
+
+    - name: Fail if kubectl is not installed
+      fail:
+        msg: "kubectl is not installed. Please install it before running this playbook."
+      when: kubectl_check.rc != 0
+
+    - name: Start Minikube
+      shell: |
+        minikube start --cpus=2 --memory=2200mb
+      register: minikube_start
+      ignore_errors: true
+
+    - name: Create namespace for Argo CD
+      shell: kubectl create namespace gitops
+      register: ns_result
+      failed_when: "'AlreadyExists' not in ns_result.stderr and ns_result.rc != 0"

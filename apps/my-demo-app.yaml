@@ -1,0 +1,19 @@
+# CLI in order to tell argo-CD what repository to look over
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-demo-app
+  namespace: gitops
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/Azneo/devops-gitops-demo
+    targetRevision: HEAD
+    path: k8s
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
